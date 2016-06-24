@@ -34,8 +34,6 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
 @property (nonatomic, readwrite) CGFloat originalTopInset;
 @property (nonatomic, readwrite) CGFloat originalHeight;
 
-@property (nonatomic, readwrite) CGFloat headerHeight;
-
 @property (nonatomic, strong, readwrite) NSLayoutConstraint *insetAwarePositionConstraint;
 @property (nonatomic, strong, readwrite) NSLayoutConstraint *insetAwareSizeConstraint;
 
@@ -67,9 +65,6 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
                                                            contentView:view
                                                                   mode:mode
                                                                 height:height];
-    
-    self.parallaxHeader.headerHeight = height;
-    
     // Calling this to position everything right
     [self shouldPositionParallaxHeader];
     
@@ -89,26 +84,6 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
               context:VGParallaxHeaderObserverContext];
 }
 
-- (void)updateParallaxHeaderViewHeight:(CGFloat)height
-{
-    CGFloat newContentInset = 0;
-    UIEdgeInsets selfContentInset = self.contentInset;
-    
-    if (height < self.parallaxHeader.headerHeight) {
-        newContentInset = self.parallaxHeader.headerHeight - height;
-        selfContentInset.top -= newContentInset;
-    } else {
-        newContentInset = height - self.parallaxHeader.headerHeight;
-        selfContentInset.top += newContentInset;
-    }
-    
-    self.contentInset = selfContentInset;
-    self.contentOffset = CGPointMake(0, -selfContentInset.top);
-    
-    self.parallaxHeader.headerHeight = height;
-    [self.parallaxHeader setNeedsLayout];
-}
-
 - (void)shouldPositionParallaxHeader
 {
     if(self.parallaxHeader.isInsideTableView) {
@@ -126,14 +101,14 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
     
     if (self.contentOffset.y < self.parallaxHeader.originalHeight) {
         // We can move height to if here because its uitableview
-        CGFloat height = self.contentOffset.y * -1 + self.parallaxHeader.originalHeight;
+        CGFloat height = self.contentOffset.y < 0 ? self.contentOffset.y * -1 + self.parallaxHeader.originalHeight : self.parallaxHeader.originalHeight;
         // Im not 100% sure if this will only speed up VGParallaxHeaderModeCenter
         // but on other modes it can be visible. 0.5px
         if (self.parallaxHeader.mode == VGParallaxHeaderModeCenter) {
             height = round(height);
         }
         // This is where the magic is happening
-        self.parallaxHeader.containerView.frame = CGRectMake(0, self.contentOffset.y, CGRectGetWidth(self.frame), height);
+        self.parallaxHeader.containerView.frame = CGRectMake(0, self.contentOffset.y < 0 ? self.contentOffset.y : 0, CGRectGetWidth(self.frame), height);
     }
 }
 
@@ -304,11 +279,9 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
 - (void)willMoveToSuperview:(UIView *)newSuperview
 {
     if (self.superview && newSuperview == nil) {
-        if ([self.superview respondsToSelector:@selector(contentInset)]) {
-            [self.superview removeObserver:self
-                                forKeyPath:NSStringFromSelector(@selector(contentInset))
-                                   context:VGParallaxHeaderObserverContext];
-        }
+        [self.superview removeObserver:self
+                            forKeyPath:NSStringFromSelector(@selector(contentInset))
+                               context:VGParallaxHeaderObserverContext];
     }
 }
 
