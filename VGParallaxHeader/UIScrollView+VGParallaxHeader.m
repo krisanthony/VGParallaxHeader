@@ -187,6 +187,7 @@ static char UIScrollViewVGParallaxHeader;
 - (void)adjustHeightTo:(CGFloat)height animate:(BOOL)animate delay:(CGFloat)delay
 {
     self.originalHeight = height;
+    [self setShadowPath];
     
     [UIView animateWithDuration:animate ? 0.35 : 0 delay:delay usingSpringWithDamping:0.75 initialSpringVelocity:0.45 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         
