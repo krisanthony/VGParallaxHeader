@@ -205,7 +205,7 @@ static char UIScrollViewVGParallaxHeader;
 - (void)applyShadow
 {
     self.containerView.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.containerView.layer.shadowOffset = CGSizeMake(0, 4);
+    self.containerView.layer.shadowOffset = CGSizeMake(0, 3);
     self.containerView.layer.shadowOpacity = .1;
     self.containerView.layer.shadowRadius = 2;
     [self setShadowPath];
