@@ -187,28 +187,12 @@ static char UIScrollViewVGParallaxHeader;
 - (void)adjustHeightTo:(CGFloat)height animate:(BOOL)animate delay:(CGFloat)delay
 {
     self.originalHeight = height;
-    [self setShadowPath];
     
     [UIView animateWithDuration:animate ? 0.35 : 0 delay:delay usingSpringWithDamping:0.75 initialSpringVelocity:0.45 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         
         [self.scrollView positionTableViewParallaxHeader];
         
     } completion:nil];
-}
-
-- (void)removeShadow
-{
-    self.containerView.layer.shadowOpacity = 0;
-    self.containerView.layer.shadowRadius = 0;
-}
-
-- (void)applyShadow
-{
-    self.containerView.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.containerView.layer.shadowOffset = CGSizeMake(0, 3);
-    self.containerView.layer.shadowOpacity = .1;
-    self.containerView.layer.shadowRadius = 2;
-    [self setShadowPath];
 }
 
 - (void)setShadowPath
