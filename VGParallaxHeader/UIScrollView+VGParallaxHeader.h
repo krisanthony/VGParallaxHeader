@@ -9,7 +9,6 @@
 
 @interface VGParallaxHeader : UIView
 
-@property (nonatomic, assign, readonly, getter=isInsideTableView) BOOL insideTableView;
 - (void)adjustHeightTo:(CGFloat)height animate:(BOOL)animate delay:(CGFloat)delay;
 - (void)applyShadow;
 - (void)removeShadow;
@@ -23,6 +22,6 @@
 - (void)setParallaxHeaderView:(UIView *)view
                        height:(CGFloat)height;
 
-- (void)shouldPositionParallaxHeader;
+- (void)positionParallaxHeader;
 
 @end
