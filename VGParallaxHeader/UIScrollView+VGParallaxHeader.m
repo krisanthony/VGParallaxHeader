@@ -19,8 +19,6 @@ static char UIScrollViewVGParallaxHeader;
                        contentView:(UIView *)view
                             height:(CGFloat)height;
 
-@property (nonatomic, assign, readwrite, getter=isInsideTableView) BOOL insideTableView;
-
 @property (nonatomic, strong, readwrite) UIView *containerView;
 @property (nonatomic, strong, readwrite) UIView *contentView;
 
@@ -45,29 +43,16 @@ static char UIScrollViewVGParallaxHeader;
                                                            contentView:view
                                                                 height:height];
     // Calling this to position everything right
-    [self shouldPositionParallaxHeader];
-    
-    // If UIScrollView adjust inset
-    if (!self.parallaxHeader.isInsideTableView) {
-        UIEdgeInsets selfContentInset = self.contentInset;
-        selfContentInset.top += height;
-        
-        self.contentInset = selfContentInset;
-        self.contentOffset = CGPointMake(0, -selfContentInset.top);
-    }
+    [self positionParallaxHeader];
 }
 
-- (void)shouldPositionParallaxHeader
+- (void)layoutSubviews
 {
-    if(self.parallaxHeader.isInsideTableView) {
-        [self positionTableViewParallaxHeader];
-    }
-    else {
-        [self positionScrollViewParallaxHeader];
-    }
+    [super layoutSubviews];
+    [self positionParallaxHeader];
 }
 
-- (void)positionTableViewParallaxHeader
+- (void)positionParallaxHeader
 {
     if (self.contentOffset.y < self.parallaxHeader.originalHeight - 6) {
         
@@ -94,16 +79,6 @@ static char UIScrollViewVGParallaxHeader;
     }
 }
 
-- (void)positionScrollViewParallaxHeader
-{
-    CGFloat height = self.contentOffset.y * -1;
-    
-    if (self.contentOffset.y < 0) {
-        // This is where the magic is happening
-        self.parallaxHeader.frame = CGRectMake(0, self.contentOffset.y, CGRectGetWidth(self.frame), height);
-    }
-}
-
 - (void)setParallaxHeader:(VGParallaxHeader *)parallaxHeader
 {
     // Remove All Subviews
@@ -115,16 +90,8 @@ static char UIScrollViewVGParallaxHeader;
         }];
     }
     
-    parallaxHeader.insideTableView = [self isKindOfClass:[UITableView class]];
-    
-    // Add Parallax Header
-    if(parallaxHeader.isInsideTableView) {
-        [(UITableView*)self setTableHeaderView:parallaxHeader];
-        [parallaxHeader setNeedsLayout];
-    }
-    else {
-        [self addSubview:parallaxHeader];
-    }
+    [(UITableView*)self setTableHeaderView:parallaxHeader];
+    [parallaxHeader setNeedsLayout];
     
     // Set Associated Object
     objc_setAssociatedObject(self, &UIScrollViewVGParallaxHeader, parallaxHeader, OBJC_ASSOCIATION_ASSIGN);
@@ -155,12 +122,6 @@ static char UIScrollViewVGParallaxHeader;
     self.originalTopInset = scrollView.contentInset.top;
     
     self.containerView = [[UIView alloc] initWithFrame:self.bounds];
-//    self.containerView.clipsToBounds = YES;
-    
-    if (!self.isInsideTableView) {
-        self.containerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    }
     
     [self addSubview:self.containerView];
     
@@ -191,7 +152,7 @@ static char UIScrollViewVGParallaxHeader;
     
     [UIView animateWithDuration:animate ? 0.35 : 0 delay:delay usingSpringWithDamping:0.75 initialSpringVelocity:0.45 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         
-        [self.scrollView positionTableViewParallaxHeader];
+        [self.scrollView positionParallaxHeader];
         
     } completion:nil];
 }
