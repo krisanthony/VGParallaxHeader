@@ -69,7 +69,7 @@ static char UIScrollViewVGParallaxHeader;
 
 - (void)positionTableViewParallaxHeader
 {
-    if (self.contentOffset.y < self.parallaxHeader.originalHeight) {
+    if (self.contentOffset.y < self.parallaxHeader.originalHeight - 6) {
         
         //  Add contentOffsetY to height
         CGFloat grow = self.contentOffset.y * -1 + self.parallaxHeader.originalHeight;
@@ -86,6 +86,11 @@ static char UIScrollViewVGParallaxHeader;
         
         //  Apply to frame
         self.parallaxHeader.containerView.frame = CGRectMake(0, y, CGRectGetWidth(self.frame), height);
+    }
+    else
+    {
+        // sticky
+        self.parallaxHeader.containerView.frame = CGRectMake(0, self.contentOffset.y - self.parallaxHeader.originalHeight + 6, CGRectGetWidth(self.frame), self.parallaxHeader.originalHeight);
     }
 }
 
@@ -150,7 +155,7 @@ static char UIScrollViewVGParallaxHeader;
     self.originalTopInset = scrollView.contentInset.top;
     
     self.containerView = [[UIView alloc] initWithFrame:self.bounds];
-    self.containerView.clipsToBounds = YES;
+//    self.containerView.clipsToBounds = YES;
     
     if (!self.isInsideTableView) {
         self.containerView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
@@ -193,24 +198,24 @@ static char UIScrollViewVGParallaxHeader;
 
 - (void)removeShadow
 {
-    self.layer.shadowOpacity = 0;
-    self.layer.shadowRadius = 0;
+    self.containerView.layer.shadowOpacity = 0;
+    self.containerView.layer.shadowRadius = 0;
 }
 
 - (void)applyShadow
 {
-    self.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.layer.shadowOffset = CGSizeMake(0, 3);
-    self.layer.shadowOpacity = .15;
-    self.layer.shadowRadius = 3;
+    self.containerView.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.containerView.layer.shadowOffset = CGSizeMake(0, 4);
+    self.containerView.layer.shadowOpacity = .1;
+    self.containerView.layer.shadowRadius = 2;
     [self setShadowPath];
 }
 
 - (void)setShadowPath
 {
-    CGRect frame = self.frame;
+    CGRect frame = self.containerView.frame;
     frame.size.height = self.originalHeight;
-    self.layer.shadowPath = [UIBezierPath bezierPathWithRect:frame].CGPath;
+    self.containerView.layer.shadowPath = [UIBezierPath bezierPathWithRect:frame].CGPath;
 }
 
 - (void)addContentViewModeFillConstraints
