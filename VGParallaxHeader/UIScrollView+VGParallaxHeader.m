@@ -22,7 +22,6 @@ static char UIScrollViewVGParallaxHeader;
 @property (nonatomic, assign, readwrite, getter=isInsideTableView) BOOL insideTableView;
 
 @property (nonatomic, strong, readwrite) UIView *containerView;
-@property (nonatomic, strong, readwrite) UIView *contentView;
 
 @property (nonatomic, weak, readwrite) UIScrollView *scrollView;
 
